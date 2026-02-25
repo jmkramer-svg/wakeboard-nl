@@ -55,7 +55,7 @@ export default async function HomePage() {
       <section className="relative h-[88vh] min-h-[540px] flex items-center overflow-hidden">
         <img
           src="https://images.unsplash.com/photo-1609096486073-e57a1e7e76a0?auto=format&fit=crop&w=1920&q=80"
-          alt="Wakeboarden in Nederland"
+          alt=""
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-black/10" />
@@ -67,21 +67,27 @@ export default async function HomePage() {
               {totalSpots} locaties in heel Nederland
             </p>
             <h1 className="text-5xl sm:text-6xl lg:text-[5.5rem] font-black text-white leading-[0.9] tracking-tight mb-7">
-              Jouw<br />
-              perfecte<br />
+              Hét meest<br />
+              complete<br />
               <span className="text-cyan-400">wakeboard</span><br />
-              spot.
+              platform van Nederland!
             </h1>
             <p className="text-white/65 text-base sm:text-lg leading-relaxed mb-10 max-w-md">
               Ontdek kabelbanen, waterski en bootrijden bij jou in de buurt — overal in Nederland.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/spots" className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold px-7 py-3.5 rounded-full hover:bg-cyan-50 transition-colors text-sm shadow-xl">
-                Alle spots bekijken
-                <ArrowRight className="w-4 h-4" />
+              <Link href="/articles" className="inline-flex items-center gap-2 border border-white/30 text-white font-semibold px-7 py-3.5 rounded-full hover:bg-white/10 transition-colors text-sm backdrop-blur">
+                Artikelen
               </Link>
-              <Link href="/spots?type=kabel" className="inline-flex items-center gap-2 border border-white/30 text-white font-semibold px-7 py-3.5 rounded-full hover:bg-white/10 transition-colors text-sm backdrop-blur">
-                Kabelbanen
+              <Link href="/trickgids" className="inline-flex items-center gap-2 border border-white/30 text-white font-semibold px-7 py-3.5 rounded-full hover:bg-white/10 transition-colors text-sm backdrop-blur">
+                Dé WakeboardNL Trickgids
+              </Link>
+              <Link href="/wedstrijden" className="inline-flex items-center gap-2 border border-white/30 text-white font-semibold px-7 py-3.5 rounded-full hover:bg-white/10 transition-colors text-sm backdrop-blur">
+                Wedstrijden
+              </Link>
+              <Link href="/spots" className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold px-7 py-3.5 rounded-full hover:bg-cyan-50 transition-colors text-sm shadow-xl">
+                Locaties
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
