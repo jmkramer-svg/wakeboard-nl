@@ -3,6 +3,27 @@ import { createClient } from '@/lib/supabase/server'
 import SpotCard from '@/components/SpotCard'
 import { Spot } from '@/types'
 import { Waves, MapPin, ArrowRight } from 'lucide-react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Wakeboard NL — Vind jouw wakeboardspot in Nederland',
+  description:
+    'Vind kabelbanen, bootrijden en waterski locaties in Nederland. De complete gids voor alle wakeboardspots per provincie.',
+  openGraph: {
+    title: 'Wakeboard NL — Vind jouw wakeboardspot in Nederland',
+    description:
+      'Vind kabelbanen, bootrijden en waterski locaties in Nederland. De complete gids voor alle wakeboardspots per provincie.',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Wakeboard NL — Vind jouw wakeboardspot in Nederland',
+    description: 'De complete gids voor alle wakeboardspots in Nederland.',
+  },
+  alternates: {
+    canonical: '/',
+  },
+}
 
 export default async function HomePage() {
   const supabase = await createClient()

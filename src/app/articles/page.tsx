@@ -5,8 +5,21 @@ import { truncate } from '@/lib/utils'
 import { FileText, Calendar } from 'lucide-react'
 
 export const metadata = {
-  title: 'Artikelen — Wakeboard NL',
+  title: 'Artikelen over wakeboarden in Nederland',
   description: 'Lees onze artikelen over wakeboarden in Nederland: tips, tricks, spots en meer.',
+  openGraph: {
+    title: 'Artikelen over wakeboarden in Nederland — Wakeboard NL',
+    description: 'Tips, tricks en nieuws over wakeboarden in Nederland.',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Artikelen over wakeboarden — Wakeboard NL',
+    description: 'Tips, tricks en nieuws over wakeboarden in Nederland.',
+  },
+  alternates: {
+    canonical: '/articles',
+  },
 }
 
 export default async function ArticlesPage() {

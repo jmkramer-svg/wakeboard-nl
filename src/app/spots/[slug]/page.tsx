@@ -71,6 +71,17 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://wakeboard-nl.nl'
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+      { '@type': 'ListItem', position: 2, name: 'Spots', item: `${siteUrl}/spots` },
+      { '@type': 'ListItem', position: 3, name: spot.name, item: `${siteUrl}/spots/${spot.slug}` },
+    ],
+  }
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SportsActivityLocation',
@@ -104,6 +115,7 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

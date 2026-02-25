@@ -5,6 +5,27 @@ import SpotFilters from '@/components/SpotFilters'
 import SpotMapWrapper from '@/components/SpotMapWrapper'
 import { Spot } from '@/types'
 import { Waves, Map } from 'lucide-react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Alle wakeboardspots in Nederland',
+  description:
+    'Overzicht van alle kabelbanen, waterski- en wakeboardlocaties in Nederland. Filter op provincie, type en niveau en vind de spot bij jou in de buurt.',
+  openGraph: {
+    title: 'Alle wakeboardspots in Nederland — Wakeboard NL',
+    description:
+      'Overzicht van alle kabelbanen, waterski- en wakeboardlocaties in Nederland. Filter op provincie, type en niveau.',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Alle wakeboardspots in Nederland — Wakeboard NL',
+    description: 'Kabelbanen, waterski en wakeboardlocaties per provincie.',
+  },
+  alternates: {
+    canonical: '/spots',
+  },
+}
 
 interface SpotsPageProps {
   searchParams: Promise<{
