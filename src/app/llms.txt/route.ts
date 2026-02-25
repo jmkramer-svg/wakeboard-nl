@@ -3,12 +3,17 @@ import { NextResponse } from 'next/server'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://wakeboard-nl.nl'
 
+interface FaqItem {
+  question: string
+  answer: string
+}
+
 export async function GET() {
   const supabase = await createClient()
 
   const [{ data: spots }, { data: articles }] = await Promise.all([
     supabase.from('spots').select('name, slug, description, city, province').eq('is_published', true),
-    supabase.from('articles').select('title, slug, excerpt').eq('is_published', true),
+    supabase.from('articles').select('title, slug, excerpt, faq_items').eq('is_published', true),
   ])
 
   const lines: string[] = [
@@ -33,6 +38,17 @@ export async function GET() {
     lines.push(`### ${article.title}`)
     lines.push(`URL: ${siteUrl}/articles/${article.slug}`)
     if (article.excerpt) lines.push(article.excerpt)
+
+    const faqItems: FaqItem[] = article.faq_items ?? []
+    if (faqItems.length > 0) {
+      lines.push('')
+      lines.push('**Veelgestelde vragen:**')
+      for (const faq of faqItems) {
+        lines.push(`- **V: ${faq.question}**`)
+        lines.push(`  A: ${faq.answer}`)
+      }
+    }
+
     lines.push('')
   }
 

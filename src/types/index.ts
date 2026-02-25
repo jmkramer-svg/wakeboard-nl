@@ -45,6 +45,17 @@ export interface SpotFilters {
   search?: string
 }
 
+export interface FaqItem {
+  question: string
+  answer: string
+}
+
+export interface TocItem {
+  id: string
+  text: string
+  level: number
+}
+
 export interface Article {
   id: string
   title: string
@@ -55,6 +66,25 @@ export interface Article {
   meta_title: string | null
   meta_description: string | null
   focus_keyword: string | null
+  faq_items: FaqItem[]
+  table_of_contents: TocItem[]
+  target_keywords: string[]
+  seo_score: number
+  is_published: boolean
+  published_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Trick {
+  id: string
+  title: string
+  slug: string
+  description: string
+  difficulty: string
+  image_url: string | null
+  video_url: string | null
+  is_current: boolean
   is_published: boolean
   published_at: string | null
   created_at: string

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { buildArticlePrompt } from '@/lib/article-prompt'
 import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest } from 'next/server'
 
@@ -22,36 +23,25 @@ export async function POST(req: NextRequest) {
     return new Response(JSON.stringify({ error: 'Onderwerp is verplicht' }), { status: 400 })
   }
 
+  // Fetch context for internal links
+  const [{ data: spots }, { data: articles }] = await Promise.all([
+    supabase
+      .from('spots')
+      .select('name, slug, city, province')
+      .eq('is_published', true),
+    supabase
+      .from('articles')
+      .select('title, slug')
+      .eq('is_published', true),
+  ])
+
+  const prompt = buildArticlePrompt(topic, spots ?? [], articles ?? [])
+
   const client = new Anthropic()
-
-  const prompt = `Schrijf een uitgebreid SEO-geoptimaliseerd artikel over het volgende onderwerp: "${topic}"
-
-Het artikel is voor een Nederlandse website over wakeboarden (wakeboard-nl.nl).
-
-Schrijf het artikel in HTML-formaat met H1, H2, H3 tags en alinea's.
-Gebruik <h1> voor de hoofdtitel, <h2> voor secties, <h3> voor subsecties, <p> voor tekst.
-Maak het artikel minimaal 600 woorden lang.
-
-Na het HTML-artikel, voeg PRECIES dit JSON-blok toe (geen andere tekst erna):
-
-\`\`\`json
-{
-  "meta_title": "...",
-  "meta_description": "...",
-  "focus_keyword": "...",
-  "excerpt": "..."
-}
-\`\`\`
-
-Regels voor het JSON-blok:
-- meta_title: max 60 tekens
-- meta_description: max 160 tekens
-- focus_keyword: het belangrijkste zoekwoord
-- excerpt: 1-2 zinnen samenvatting`
 
   const stream = await client.messages.stream({
     model: 'claude-sonnet-4-6',
-    max_tokens: 4000,
+    max_tokens: 8192,
     messages: [{ role: 'user', content: prompt }],
   })
 

@@ -1,9 +1,13 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Article } from '@/types'
+import { Article, FaqItem } from '@/types'
+import { extractToc, addHeadingIds } from '@/lib/toc'
 import { Calendar, ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
+import TableOfContents from '@/components/TableOfContents'
 import type { Metadata } from 'next'
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://wakeboard-nl.nl'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -14,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('articles')
-    .select('title, meta_title, meta_description, excerpt, cover_image_url, published_at')
+    .select('title, meta_title, meta_description, excerpt, cover_image_url, published_at, target_keywords, focus_keyword')
     .eq('slug', slug)
     .eq('is_published', true)
     .single()
@@ -23,10 +27,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = data.meta_title ?? `${data.title} — Wakeboard NL`
   const description = data.meta_description ?? data.excerpt ?? ''
+  const keywords = [
+    ...(data.focus_keyword ? [data.focus_keyword] : []),
+    ...(data.target_keywords ?? []),
+  ]
 
   return {
     title,
     description,
+    keywords: keywords.length > 0 ? keywords : undefined,
     openGraph: {
       title,
       description,
@@ -56,8 +65,14 @@ export default async function ArticleDetailPage({ params }: Props) {
   if (!data) notFound()
 
   const article = data as Article
+  const faqItems: FaqItem[] = article.faq_items ?? []
+  const contentWithIds = addHeadingIds(article.content)
+  const toc = article.table_of_contents?.length > 0
+    ? article.table_of_contents
+    : extractToc(contentWithIds)
 
-  const jsonLd = {
+  // Enriched Article JSON-LD
+  const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: article.title,
@@ -65,16 +80,75 @@ export default async function ArticleDetailPage({ params }: Props) {
     image: article.cover_image_url,
     datePublished: article.published_at,
     dateModified: article.updated_at,
+    keywords: [
+      ...(article.focus_keyword ? [article.focus_keyword] : []),
+      ...(article.target_keywords ?? []),
+    ].join(', ') || undefined,
+    author: {
+      '@type': 'Organization',
+      name: 'Wakeboard NL',
+      url: siteUrl,
+    },
     publisher: {
       '@type': 'Organization',
       name: 'Wakeboard NL',
-      url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://wakeboard-nl.nl',
+      url: siteUrl,
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${siteUrl}/articles/${article.slug}`,
     },
   }
 
+  // BreadcrumbList JSON-LD
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Artikelen',
+        item: `${siteUrl}/articles`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: article.title,
+        item: `${siteUrl}/articles/${article.slug}`,
+      },
+    ],
+  }
+
+  // FAQPage JSON-LD (only if FAQ items exist)
+  const faqJsonLd = faqItems.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqItems.map((faq) => ({
+          '@type': 'Question',
+          name: faq.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.answer,
+          },
+        })),
+      }
+    : null
+
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      {faqJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      )}
 
       {/* ── HERO ── */}
       <section className="relative overflow-hidden min-h-[45vh] sm:min-h-[55vh] flex items-end">
@@ -137,9 +211,10 @@ export default async function ArticleDetailPage({ params }: Props) {
       {/* ── CONTENT ── */}
       <div className="bg-white">
         <div className="max-w-3xl mx-auto px-5 py-12 sm:py-16">
+          {toc.length > 0 && <TableOfContents items={toc} />}
           <div
             className="prose prose-slate max-w-none prose-headings:font-black prose-headings:text-slate-900 prose-headings:tracking-tight prose-a:text-cyan-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-2xl prose-img:shadow-md prose-strong:text-slate-900"
-            dangerouslySetInnerHTML={{ __html: article.content }}
+            dangerouslySetInnerHTML={{ __html: contentWithIds }}
           />
         </div>
       </div>
