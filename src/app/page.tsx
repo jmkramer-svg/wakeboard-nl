@@ -54,7 +54,7 @@ export default async function HomePage() {
       {/* ── HERO ── */}
       <section className="relative h-[88vh] min-h-[540px] flex items-center overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1609096486073-e57a1e7e76a0?auto=format&fit=crop&w=1920&q=80"
+          src="https://images.unsplash.com/photo-1610665893833-3692e97e1ee8?auto=format&fit=crop&w=1920&q=80"
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
         />
