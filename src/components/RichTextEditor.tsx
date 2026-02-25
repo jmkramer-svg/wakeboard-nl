@@ -26,6 +26,7 @@ interface RichTextEditorProps {
 const RichTextEditor = forwardRef<RichTextEditorHandle, RichTextEditorProps>(
   function RichTextEditor({ content = '', onChange, placeholder = 'Begin met schrijven...' }, ref) {
     const editor = useEditor({
+      immediatelyRender: false,
       extensions: [
         StarterKit.configure({ heading: false }),
         Heading.configure({ levels: [1, 2, 3] }),
