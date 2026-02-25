@@ -48,15 +48,15 @@ export default async function HomePage() {
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC40Ij48cGF0aCBkPSJNMzYgMzRjMC0yIDItNCAyLTZzLTItNC0yLTYtMi00LTItNiAyLTQgMi02Ii8+PC9nPjwvZz48L3N2Zz4=')]" />
         </div>
-        <div className="max-w-6xl mx-auto px-4 py-24 text-center relative">
+        <div className="max-w-6xl mx-auto px-4 py-12 md:py-24 text-center relative">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium mb-6 border border-white/20">
             <Waves className="w-4 h-4" />
             {totalSpots ?? 0} spots in Nederland
           </div>
-          <h1 className="text-5xl font-extrabold tracking-tight mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-6 leading-tight">
             Vind jouw wakeboard spot
           </h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-base sm:text-xl text-blue-100 max-w-2xl mx-auto mb-10 leading-relaxed">
             De complete gids voor wakeboardlocaties in Nederland. Kabelbanen,
             bootrijden en alles daartussenin — bij jou in de buurt.
           </p>
@@ -87,7 +87,7 @@ export default async function HomePage() {
               { label: 'Provincies', value: '12' },
               { label: 'Gratis toegang', value: '100%' },
             ].map((stat) => (
-              <div key={stat.label} className="px-8 py-2">
+              <div key={stat.label} className="px-3 sm:px-8 py-2">
                 <div className="text-3xl font-extrabold text-blue-600">{stat.value}</div>
                 <div className="text-sm text-slate-500 mt-1">{stat.label}</div>
               </div>
@@ -98,7 +98,7 @@ export default async function HomePage() {
 
       {/* Recent spots */}
       <section className="max-w-6xl mx-auto px-4 py-16">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
           <div>
             <h2 className="text-2xl font-bold text-slate-900">Nieuwste spots</h2>
             <p className="text-slate-500 mt-1">Recent toegevoegd aan de directory</p>
@@ -131,7 +131,7 @@ export default async function HomePage() {
       <section className="bg-slate-900 text-white py-16">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <MapPin className="w-10 h-10 text-blue-400 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold mb-4">Weet jij een spot die er nog niet opstaat?</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">Weet jij een spot die er nog niet opstaat?</h2>
           <p className="text-slate-400 mb-8">
             Help de community door wakeboardlocaties toe te voegen via het admin dashboard.
           </p>

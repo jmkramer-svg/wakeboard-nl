@@ -38,9 +38,9 @@ export default function SpotFilters() {
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-      <div className="flex flex-wrap gap-3 items-end">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:items-end">
         {/* Zoekbalk */}
-        <div className="flex-1 min-w-[200px]">
+        <div className="w-full sm:flex-1 sm:min-w-[180px]">
           <label className="text-xs font-medium text-slate-600 block mb-1.5">Zoeken</label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -49,18 +49,18 @@ export default function SpotFilters() {
               placeholder="Naam of stad..."
               defaultValue={currentSearch}
               onChange={(e) => updateFilter('search', e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* Provincie */}
-        <div className="min-w-[160px]">
+        <div className="w-full sm:w-auto sm:min-w-[150px]">
           <label className="text-xs font-medium text-slate-600 block mb-1.5">Provincie</label>
           <select
             value={currentProvince}
             onChange={(e) => updateFilter('province', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           >
             <option value="">Alle provincies</option>
             {PROVINCES.map((p) => (
@@ -70,12 +70,12 @@ export default function SpotFilters() {
         </div>
 
         {/* Type */}
-        <div className="min-w-[140px]">
+        <div className="w-full sm:w-auto sm:min-w-[130px]">
           <label className="text-xs font-medium text-slate-600 block mb-1.5">Type</label>
           <select
             value={currentType}
             onChange={(e) => updateFilter('type', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           >
             <option value="">Alle types</option>
             {Object.entries(TYPE_LABELS).map(([key, label]) => (
@@ -85,12 +85,12 @@ export default function SpotFilters() {
         </div>
 
         {/* Niveau */}
-        <div className="min-w-[150px]">
+        <div className="w-full sm:w-auto sm:min-w-[140px]">
           <label className="text-xs font-medium text-slate-600 block mb-1.5">Niveau</label>
           <select
             value={currentDifficulty}
             onChange={(e) => updateFilter('difficulty', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           >
             <option value="">Alle niveaus</option>
             {Object.entries(DIFFICULTY_LABELS).map(([key, label]) => (
@@ -103,10 +103,10 @@ export default function SpotFilters() {
         {hasFilters && (
           <button
             onClick={clearAll}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm text-slate-500 hover:text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+            className="flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm text-slate-500 hover:text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors w-full sm:w-auto"
           >
             <X className="w-3.5 h-3.5" />
-            Reset
+            Reset filters
           </button>
         )}
       </div>

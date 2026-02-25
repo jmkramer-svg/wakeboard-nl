@@ -154,7 +154,7 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
                   {DIFFICULTY_LABELS[spot.difficulty]}
                 </span>
               </div>
-              <h1 className="text-3xl font-extrabold text-slate-900">{spot.name}</h1>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">{spot.name}</h1>
               <div className="flex items-center gap-1.5 text-slate-500 mt-2">
                 <MapPin className="w-4 h-4" />
                 <span>{spot.city}, {spot.province}</span>
@@ -175,14 +175,14 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
             </div>
 
             {/* Description */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
               <h2 className="font-bold text-slate-900 mb-3">Over dit spot</h2>
               <p className="text-slate-600 leading-relaxed">{spot.description}</p>
             </div>
 
             {/* Features */}
             {spot.features?.length > 0 && (
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
+              <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
                 <h2 className="font-bold text-slate-900 mb-3">Faciliteiten</h2>
                 <div className="flex flex-wrap gap-2">
                   {spot.features.map((feature: string) => (
@@ -196,7 +196,7 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
 
             {/* Obstacles */}
             {spot.obstacles?.length > 0 && (
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
+              <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
                 <h2 className="font-bold text-slate-900 mb-3">Obstakels</h2>
                 <div className="flex flex-wrap gap-2">
                   {spot.obstacles.map((ob: string) => (
@@ -209,7 +209,7 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
             )}
 
             {/* Map */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
               <h2 className="font-bold text-slate-900 mb-4">Locatie</h2>
               <SpotMapWrapper
                 spots={[spot]}
@@ -226,7 +226,7 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
             </div>
 
             {/* Reviews */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
               <h2 className="font-bold text-slate-900 mb-5">
                 Reviews {reviews.length > 0 && <span className="text-slate-400 font-normal text-base">({reviews.length})</span>}
               </h2>
