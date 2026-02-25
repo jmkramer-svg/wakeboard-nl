@@ -74,42 +74,74 @@ export default async function ArticleDetailPage({ params }: Props) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        <Link
-          href="/articles"
-          className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 mb-6"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Terug naar artikelen
-        </Link>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-        {article.cover_image_url && (
+      {/* ── HERO ── */}
+      <section className="relative overflow-hidden min-h-[45vh] sm:min-h-[55vh] flex items-end">
+        {/* Background: cover photo or dark gradient */}
+        {article.cover_image_url ? (
           <img
             src={article.cover_image_url}
-            alt={article.title}
-            className="w-full h-64 sm:h-80 object-cover rounded-xl mb-8"
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
           />
+        ) : (
+          <>
+            <div className="absolute inset-0 bg-[#050e1a]" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#071d31] via-[#050e1a] to-[#030b15]" />
+            <div className="absolute -top-40 right-1/4 w-[600px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px]" />
+            <div
+              className="absolute inset-0 opacity-[0.06]"
+              style={{ backgroundImage: 'radial-gradient(circle, #94a3b8 1px, transparent 1px)', backgroundSize: '32px 32px' }}
+            />
+          </>
         )}
 
-        <h1 className="text-3xl font-extrabold text-slate-900 mb-3">{article.title}</h1>
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent" />
 
-        {article.published_at && (
-          <div className="flex items-center gap-1.5 text-sm text-slate-400 mb-8">
-            <Calendar className="w-4 h-4" />
-            {new Date(article.published_at).toLocaleDateString('nl-NL', {
-              day: 'numeric', month: 'long', year: 'numeric',
-            })}
-          </div>
-        )}
+        {/* Content in hero */}
+        <div className="relative w-full max-w-3xl mx-auto px-5 pb-12 pt-20">
+          <Link
+            href="/articles"
+            className="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm mb-8 transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Terug naar artikelen
+          </Link>
 
-        <div
-          className="prose prose-slate max-w-none prose-headings:font-bold prose-a:text-blue-600"
-          dangerouslySetInnerHTML={{ __html: article.content }}
-        />
+          {article.published_at && (
+            <div className="flex items-center gap-1.5 text-white/45 text-sm mb-4">
+              <Calendar className="w-4 h-4" />
+              {new Date(article.published_at).toLocaleDateString('nl-NL', {
+                day: 'numeric', month: 'long', year: 'numeric',
+              })}
+            </div>
+          )}
+
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight drop-shadow">
+            {article.title}
+          </h1>
+
+          {article.excerpt && (
+            <p className="text-white/50 mt-4 text-base sm:text-lg leading-relaxed max-w-2xl">
+              {article.excerpt}
+            </p>
+          )}
+        </div>
+
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent" />
+      </section>
+
+      {/* ── CONTENT ── */}
+      <div className="bg-white">
+        <div className="max-w-3xl mx-auto px-5 py-12 sm:py-16">
+          <div
+            className="prose prose-slate max-w-none prose-headings:font-black prose-headings:text-slate-900 prose-headings:tracking-tight prose-a:text-cyan-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-2xl prose-img:shadow-md prose-strong:text-slate-900"
+            dangerouslySetInnerHTML={{ __html: article.content }}
+          />
+        </div>
       </div>
     </>
   )
