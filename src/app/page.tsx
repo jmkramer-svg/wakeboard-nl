@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import SpotCard from '@/components/SpotCard'
-import { Spot } from '@/types'
-import { ArrowRight, ChevronRight } from 'lucide-react'
+import { Spot, Article, Trick } from '@/types'
+import { ArrowRight, ChevronRight, Calendar, Play } from 'lucide-react'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -27,15 +27,36 @@ const PROVINCE_PHOTOS: Record<string, string> = {
   'Zeeland':        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=70',
 }
 
+const DIFFICULTY_COLORS: Record<string, string> = {
+  beginner: 'bg-green-100 text-green-800',
+  intermediate: 'bg-amber-100 text-amber-800',
+  gevorderd: 'bg-red-100 text-red-800',
+}
+
+function formatDate(dateString: string | null): string {
+  if (!dateString) return ''
+  return new Date(dateString).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+function getYouTubeEmbedUrl(url: string): string | null {
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
+  if (match) return `https://www.youtube.com/embed/${match[1]}`
+  return null
+}
+
 export default async function HomePage() {
   const supabase = await createClient()
 
-  const [{ data: spots }, { data: provinceCounts }] = await Promise.all([
+  const [{ data: spots }, { data: provinceCounts }, { data: articles }, { data: tricks }] = await Promise.all([
     supabase.from('spots').select('*').eq('is_published', true).order('created_at', { ascending: false }).limit(3),
     supabase.from('spots').select('province').eq('is_published', true),
+    supabase.from('articles').select('*').eq('is_published', true).order('published_at', { ascending: false }).limit(3),
+    supabase.from('tricks').select('*').eq('is_current', true).eq('is_published', true).limit(1),
   ])
 
   const featuredSpots: Spot[] = spots ?? []
+  const latestArticles: Article[] = articles ?? []
+  const currentTrick: Trick | null = (tricks ?? [])[0] ?? null
 
   // Tel spots per provincie
   const counts: Record<string, number> = {}
@@ -75,30 +96,136 @@ export default async function HomePage() {
             <p className="text-white/65 text-base sm:text-lg leading-relaxed mb-10 max-w-md">
               Ontdek kabelbanen, waterski en bootrijden bij jou in de buurt — overal in Nederland.
             </p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/articles" className="inline-flex items-center gap-2 border border-white/30 text-white font-semibold px-7 py-3.5 rounded-full hover:bg-white/10 transition-colors text-sm backdrop-blur">
+            <div className="flex flex-wrap sm:flex-nowrap gap-3">
+              <Link href="/articles" className="inline-flex items-center gap-1.5 bg-white/15 border border-white/40 text-white font-semibold px-5 py-2.5 rounded-full hover:bg-white/25 transition-colors text-sm backdrop-blur-sm whitespace-nowrap">
                 Artikelen
               </Link>
-              <Link href="/trickgids" className="inline-flex items-center gap-2 border border-white/30 text-white font-semibold px-7 py-3.5 rounded-full hover:bg-white/10 transition-colors text-sm backdrop-blur">
+              <Link href="/trickgids" className="inline-flex items-center gap-1.5 bg-white/15 border border-white/40 text-white font-semibold px-5 py-2.5 rounded-full hover:bg-white/25 transition-colors text-sm backdrop-blur-sm whitespace-nowrap">
                 Dé WakeboardNL Trickgids
               </Link>
-              <Link href="/wedstrijden" className="inline-flex items-center gap-2 border border-white/30 text-white font-semibold px-7 py-3.5 rounded-full hover:bg-white/10 transition-colors text-sm backdrop-blur">
+              <Link href="/wedstrijden" className="inline-flex items-center gap-1.5 bg-white/15 border border-white/40 text-white font-semibold px-5 py-2.5 rounded-full hover:bg-white/25 transition-colors text-sm backdrop-blur-sm whitespace-nowrap">
                 Wedstrijden
               </Link>
-              <Link href="/spots" className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold px-7 py-3.5 rounded-full hover:bg-cyan-50 transition-colors text-sm shadow-xl">
+              <Link href="/spots" className="inline-flex items-center gap-1.5 bg-white text-slate-900 font-bold px-5 py-2.5 rounded-full hover:bg-cyan-50 transition-colors text-sm shadow-xl whitespace-nowrap">
                 Locaties
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40">
-          <span className="text-xs uppercase tracking-widest">Scroll</span>
-          <div className="w-px h-10 bg-white/20" />
-        </div>
       </section>
+
+      {/* ── LAATSTE NIEUWS ── */}
+      {latestArticles.length > 0 && (
+        <section className="py-20 sm:py-24 bg-white">
+          <div className="max-w-6xl mx-auto px-5">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+              <div>
+                <p className="text-cyan-600 text-xs font-semibold uppercase tracking-widest mb-2">Vers van de pers</p>
+                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">Laatste nieuws</h2>
+              </div>
+              <Link href="/articles" className="text-sm font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 transition-colors">
+                Alle artikelen <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {latestArticles.map((article) => (
+                <Link
+                  key={article.id}
+                  href={`/articles/${article.slug}`}
+                  className="group relative rounded-2xl overflow-hidden aspect-[4/3] shadow-sm hover:shadow-lg transition-all duration-300 bg-slate-100"
+                >
+                  {article.cover_image_url ? (
+                    <img
+                      src={article.cover_image_url}
+                      alt={article.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-cyan-500 to-slate-700" />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-5">
+                    {article.published_at && (
+                      <p className="text-white/60 text-xs mb-2 flex items-center gap-1.5">
+                        <Calendar className="w-3 h-3" />
+                        {formatDate(article.published_at)}
+                      </p>
+                    )}
+                    <h3 className="text-white font-bold text-sm leading-tight mb-2">{article.title}</h3>
+                    <span className="text-cyan-400 text-xs font-semibold group-hover:gap-2 flex items-center gap-1 transition-all">
+                      Lees meer <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── TRICK VAN DE WEEK ── */}
+      {currentTrick && (
+        <section className="py-20 sm:py-24 bg-slate-900">
+          <div className="max-w-6xl mx-auto px-5">
+            <div className="mb-10">
+              <p className="text-cyan-400 text-xs font-semibold uppercase tracking-widest mb-2">Leer iets nieuws</p>
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Trick van de week</h2>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+              {/* Afbeelding of video */}
+              <div className="relative rounded-2xl overflow-hidden aspect-video bg-slate-800 shadow-2xl">
+                {currentTrick.video_url && getYouTubeEmbedUrl(currentTrick.video_url) ? (
+                  <iframe
+                    src={getYouTubeEmbedUrl(currentTrick.video_url)!}
+                    title={currentTrick.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
+                ) : currentTrick.image_url ? (
+                  <img
+                    src={currentTrick.image_url}
+                    alt={currentTrick.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center">
+                      <Play className="w-8 h-8 text-white/40 ml-1" />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Info */}
+              <div>
+                <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full mb-5 capitalize ${DIFFICULTY_COLORS[currentTrick.difficulty] ?? 'bg-slate-100 text-slate-700'}`}>
+                  {currentTrick.difficulty}
+                </span>
+                <h3 className="text-3xl sm:text-4xl font-black text-white mb-5">{currentTrick.title}</h3>
+                <p className="text-white/65 text-base leading-relaxed mb-8 whitespace-pre-line">
+                  {currentTrick.description}
+                </p>
+                {currentTrick.video_url && !getYouTubeEmbedUrl(currentTrick.video_url) && (
+                  <a
+                    href={currentTrick.video_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-white font-bold px-6 py-3 rounded-full transition-colors text-sm"
+                  >
+                    <Play className="w-4 h-4" />
+                    Bekijk video
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── BROWSE PER PROVINCIE ── */}
       <section className="py-20 sm:py-24 bg-slate-50">

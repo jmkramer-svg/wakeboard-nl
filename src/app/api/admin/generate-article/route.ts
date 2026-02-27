@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { buildArticlePrompt } from '@/lib/article-prompt'
+import { searchPexelsPhotos } from '@/lib/pexels'
 import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest } from 'next/server'
 
@@ -45,16 +46,40 @@ export async function POST(req: NextRequest) {
     messages: [{ role: 'user', content: prompt }],
   })
 
+  const encoder = new TextEncoder()
+
   const readableStream = new ReadableStream({
     async start(controller) {
+      let fullText = ''
+
       for await (const chunk of stream) {
         if (
           chunk.type === 'content_block_delta' &&
           chunk.delta.type === 'text_delta'
         ) {
-          controller.enqueue(new TextEncoder().encode(chunk.delta.text))
+          fullText += chunk.delta.text
+          controller.enqueue(encoder.encode(chunk.delta.text))
         }
       }
+
+      // Extract focus_keyword from JSON block for Pexels search
+      const jsonMatch = fullText.match(/```json\s*([\s\S]*?)```/)
+      let searchQuery = topic
+      if (jsonMatch) {
+        try {
+          const seo = JSON.parse(jsonMatch[1])
+          if (seo.focus_keyword) searchQuery = seo.focus_keyword
+        } catch {}
+      }
+
+      // Search Pexels for relevant photos
+      const photos = await searchPexelsPhotos(`${searchQuery} wakeboard`, 2)
+
+      // Send marker + image data
+      controller.enqueue(
+        encoder.encode(`\n<!-- PEXELS_DATA:${JSON.stringify(photos)} -->`)
+      )
+
       controller.close()
     },
   })

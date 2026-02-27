@@ -7,7 +7,7 @@ import { Article, FaqItem } from '@/types'
 import { slugify } from '@/lib/utils'
 import { calculateSeoScore, SeoCheck } from '@/lib/seo-score'
 import { extractToc, addHeadingIds } from '@/lib/toc'
-import { Save, Eye, Trash2, Sparkles, X, Plus, GripVertical } from 'lucide-react'
+import { Save, Eye, Trash2, Sparkles, X, Plus, GripVertical, Check, Loader2, ImageIcon } from 'lucide-react'
 import RichTextEditor, { RichTextEditorHandle } from './RichTextEditor'
 import ImageUploader from './ImageUploader'
 
@@ -70,6 +70,8 @@ export default function ArticleForm({ article }: ArticleFormProps) {
   const [aiTopic, setAiTopic] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
   const [aiError, setAiError] = useState('')
+  const [aiStep, setAiStep] = useState<'idle' | 'generating' | 'images' | 'done'>('idle')
+  const [aiSuccess, setAiSuccess] = useState(false)
 
   // Target keywords as comma-separated string for editing
   const [targetKeywordsStr, setTargetKeywordsStr] = useState(
@@ -210,6 +212,8 @@ export default function ArticleForm({ article }: ArticleFormProps) {
     if (!aiTopic.trim()) return
     setAiLoading(true)
     setAiError('')
+    setAiStep('generating')
+    setAiSuccess(false)
 
     try {
       const res = await fetch('/api/admin/generate-article', {
@@ -231,10 +235,47 @@ export default function ArticleForm({ article }: ArticleFormProps) {
         const { done, value } = await reader.read()
         if (done) break
         fullText += decoder.decode(value, { stream: true })
-        // Strip JSON block at the end before showing in editor
-        const htmlPart = fullText.replace(/```json[\s\S]*?```/g, '').trim()
+        // Strip JSON block and PEXELS marker before showing in editor
+        const htmlPart = fullText
+          .replace(/```json[\s\S]*?```/g, '')
+          .replace(/\n<!-- PEXELS_DATA:[\s\S]*?-->/g, '')
+          .trim()
         editorRef.current?.setContent(htmlPart)
       }
+
+      // Extract Pexels image data from marker
+      setAiStep('images')
+      interface PexelsPhoto { url: string; alt: string; photographer: string; photographerUrl: string }
+      let photos: PexelsPhoto[] = []
+      const pexelsMatch = fullText.match(/<!-- PEXELS_DATA:([\s\S]*?)-->/)
+      if (pexelsMatch) {
+        try {
+          photos = JSON.parse(pexelsMatch[1].trim())
+        } catch {}
+      }
+
+      // Strip markers from article text
+      let articleHtml = fullText
+        .replace(/```json[\s\S]*?```/g, '')
+        .replace(/\n<!-- PEXELS_DATA:[\s\S]*?-->/g, '')
+        .trim()
+
+      // Replace <!-- IMAGE --> placeholders with real img tags
+      if (photos.length > 0) {
+        let imageIndex = 0
+        articleHtml = articleHtml.replace(/<!-- IMAGE -->/g, () => {
+          if (imageIndex < photos.length) {
+            const photo = photos[imageIndex++]
+            return `<figure><img src="${photo.url}" alt="${photo.alt}" style="width:100%;border-radius:8px;margin:1rem 0" /><figcaption style="text-align:center;font-size:0.85rem;color:#64748b">Foto door <a href="${photo.photographerUrl}" target="_blank" rel="noopener noreferrer">${photo.photographer}</a> via Pexels</figcaption></figure>`
+          }
+          return ''
+        })
+      } else {
+        // Remove placeholders if no photos found
+        articleHtml = articleHtml.replace(/<!-- IMAGE -->/g, '')
+      }
+
+      editorRef.current?.setContent(articleHtml)
 
       // Extract title from H1
       const h1Match = fullText.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)
@@ -270,10 +311,18 @@ export default function ArticleForm({ article }: ArticleFormProps) {
         }))
       }
 
-      setShowAI(false)
-      setAiTopic('')
+      // Show success state
+      setAiStep('done')
+      setAiSuccess(true)
+      setTimeout(() => {
+        setShowAI(false)
+        setAiTopic('')
+        setAiStep('idle')
+        setAiSuccess(false)
+      }, 2000)
     } catch (e: unknown) {
       setAiError(e instanceof Error ? e.message : 'Onbekende fout')
+      setAiStep('idle')
     } finally {
       setAiLoading(false)
     }
@@ -551,30 +600,95 @@ export default function ArticleForm({ article }: ArticleFormProps) {
                 <Sparkles className="w-5 h-5 text-purple-600" />
                 AI Artikelgenerator
               </h3>
-              <button type="button" onClick={() => { setShowAI(false); setAiError('') }}>
-                <X className="w-5 h-5 text-slate-400 hover:text-slate-600" />
-              </button>
+              {!aiLoading && aiStep !== 'done' && (
+                <button type="button" onClick={() => { setShowAI(false); setAiError(''); setAiStep('idle') }}>
+                  <X className="w-5 h-5 text-slate-400 hover:text-slate-600" />
+                </button>
+              )}
             </div>
-            <p className="text-sm text-slate-500 mb-4">
-              Beschrijf het onderwerp en de AI genereert een volledig artikel met SEO-optimalisatie, FAQ en target keywords.
-            </p>
-            <textarea
-              value={aiTopic}
-              onChange={(e) => setAiTopic(e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3"
-              placeholder="bijv. 'De beste kabelbanen van Nederland voor beginners'"
-            />
-            {aiError && <p className="text-sm text-red-600 mb-3">{aiError}</p>}
-            <button
-              type="button"
-              onClick={handleGenerate}
-              disabled={aiLoading || !aiTopic.trim()}
-              className="w-full inline-flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 text-white font-semibold py-2.5 rounded-lg transition-colors text-sm"
-            >
-              <Sparkles className="w-4 h-4" />
-              {aiLoading ? 'Genereren...' : 'Artikel genereren'}
-            </button>
+
+            {aiStep === 'idle' && !aiLoading && (
+              <>
+                <p className="text-sm text-slate-500 mb-4">
+                  Beschrijf het onderwerp en de AI genereert een volledig artikel met SEO-optimalisatie, FAQ en afbeeldingen.
+                </p>
+                <textarea
+                  value={aiTopic}
+                  onChange={(e) => setAiTopic(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3"
+                  placeholder="bijv. 'De beste kabelbanen van Nederland voor beginners'"
+                />
+                {aiError && <p className="text-sm text-red-600 mb-3">{aiError}</p>}
+                <button
+                  type="button"
+                  onClick={handleGenerate}
+                  disabled={!aiTopic.trim()}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 text-white font-semibold py-2.5 rounded-lg transition-colors text-sm"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Artikel genereren
+                </button>
+              </>
+            )}
+
+            {(aiStep === 'generating' || aiStep === 'images' || aiStep === 'done') && (
+              <div className="space-y-3 py-2">
+                {/* Step 1: Generating article */}
+                <div className="flex items-center gap-3">
+                  {aiStep === 'generating' ? (
+                    <Loader2 className="w-5 h-5 text-purple-600 animate-spin shrink-0" />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                      <Check className="w-3.5 h-3.5 text-green-600" />
+                    </div>
+                  )}
+                  <span className={`text-sm ${aiStep === 'generating' ? 'text-slate-900 font-medium' : 'text-slate-500'}`}>
+                    Artikel genereren...
+                  </span>
+                </div>
+
+                {/* Step 2: Searching images */}
+                <div className="flex items-center gap-3">
+                  {aiStep === 'images' ? (
+                    <Loader2 className="w-5 h-5 text-purple-600 animate-spin shrink-0" />
+                  ) : aiStep === 'done' ? (
+                    <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                      <Check className="w-3.5 h-3.5 text-green-600" />
+                    </div>
+                  ) : (
+                    <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                      <ImageIcon className="w-3.5 h-3.5 text-slate-400" />
+                    </div>
+                  )}
+                  <span className={`text-sm ${aiStep === 'images' ? 'text-slate-900 font-medium' : aiStep === 'done' ? 'text-slate-500' : 'text-slate-400'}`}>
+                    Afbeeldingen zoeken...
+                  </span>
+                </div>
+
+                {/* Step 3: Done */}
+                <div className="flex items-center gap-3">
+                  {aiStep === 'done' ? (
+                    <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                      <Check className="w-3.5 h-3.5 text-green-600" />
+                    </div>
+                  ) : (
+                    <div className="w-5 h-5 rounded-full bg-slate-100 shrink-0" />
+                  )}
+                  <span className={`text-sm ${aiStep === 'done' ? 'text-green-700 font-medium' : 'text-slate-400'}`}>
+                    Klaar!
+                  </span>
+                </div>
+
+                {/* Success banner */}
+                {aiStep === 'done' && (
+                  <div className="mt-4 bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-lg flex items-center gap-2">
+                    <Check className="w-4 h-4 shrink-0" />
+                    Artikel succesvol gegenereerd met afbeeldingen!
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

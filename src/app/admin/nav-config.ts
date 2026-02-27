@@ -1,8 +1,9 @@
-import { LayoutDashboard, Waves, FileText, Star } from 'lucide-react'
+import { LayoutDashboard, Waves, FileText, Star, Zap } from 'lucide-react'
 
 export const adminNavItems = [
-  { href: '/admin',          label: 'Dashboard',  icon: LayoutDashboard },
-  { href: '/admin/spots',    label: 'Banen',      icon: Waves },
-  { href: '/admin/articles', label: 'Artikelen',  icon: FileText },
-  { href: '/admin/reviews',  label: 'Reviews',    icon: Star },
+  { href: '/admin',          label: 'Dashboard',         icon: LayoutDashboard },
+  { href: '/admin/spots',    label: 'Banen',             icon: Waves },
+  { href: '/admin/articles', label: 'Artikelen',         icon: FileText },
+  { href: '/admin/tricks',   label: 'Trick van de week', icon: Zap },
+  { href: '/admin/reviews',  label: 'Reviews',           icon: Star },
 ]

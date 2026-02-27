@@ -52,6 +52,12 @@ Het artikel is voor wakeboard-nl.nl, de complete Nederlandse gids voor wakeboard
 - Gebruik gestructureerde lijsten voor opsommingen.
 - Beantwoord impliciete vragen direct en concreet.
 
+## Afbeelding-placeholders
+- Plaats EXACT 2 keer de marker \`<!-- IMAGE -->\` in het artikel.
+- De eerste \`<!-- IMAGE -->\` komt direct NA de eerste <h2>-sectie (na de laatste </p> van die sectie).
+- De tweede \`<!-- IMAGE -->\` komt direct NA de derde <h2>-sectie.
+- Voeg GEEN andere afbeeldingstags of -placeholders toe.
+
 ## FAQ-sectie
 - Voeg aan het EINDE van het artikel een FAQ-sectie toe met minimaal 4 veelgestelde vragen.
 - Gebruik <h2>Veelgestelde vragen</h2> als kop.
