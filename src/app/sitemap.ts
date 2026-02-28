@@ -7,16 +7,17 @@ const TRICKGIDS_SLUG = 'de-meest-populaire-wakeboard-tricks-een-complete-gids-vo
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient()
 
-  const [{ data: spots }, { data: articles }] = await Promise.all([
+  const [{ data: spots }, { data: articles }, { data: tricks }] = await Promise.all([
     supabase.from('spots').select('slug, updated_at').eq('is_published', true),
     supabase.from('articles').select('slug, updated_at').eq('is_published', true).neq('slug', TRICKGIDS_SLUG),
+    supabase.from('tricks').select('slug, updated_at').eq('is_published', true),
   ])
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: siteUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
     { url: `${siteUrl}/spots`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${siteUrl}/articles`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${siteUrl}/trickgids`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${siteUrl}/trickgids`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
     { url: `${siteUrl}/privacy`, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${siteUrl}/voorwaarden`, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${siteUrl}/contact`, changeFrequency: 'yearly', priority: 0.4 },
@@ -38,5 +39,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  return [...staticRoutes, ...spotRoutes, ...articleRoutes]
+  const trickRoutes: MetadataRoute.Sitemap = (tricks ?? []).map((t) => ({
+    url: `${siteUrl}/trickgids/${t.slug}`,
+    lastModified: new Date(t.updated_at),
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }))
+
+  return [...staticRoutes, ...spotRoutes, ...articleRoutes, ...trickRoutes]
 }

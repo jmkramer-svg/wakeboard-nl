@@ -210,17 +210,26 @@ export default async function HomePage() {
                 <p className="text-white/65 text-base leading-relaxed mb-8 whitespace-pre-line">
                   {currentTrick.description}
                 </p>
-                {currentTrick.video_url && !getYouTubeEmbedUrl(currentTrick.video_url) && (
-                  <a
-                    href={currentTrick.video_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href={`/trickgids/${currentTrick.slug}`}
                     className="inline-flex items-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-white font-bold px-6 py-3 rounded-full transition-colors text-sm"
                   >
-                    <Play className="w-4 h-4" />
-                    Bekijk video
-                  </a>
-                )}
+                    Bekijk volledige uitleg
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  {currentTrick.video_url && !getYouTubeEmbedUrl(currentTrick.video_url) && (
+                    <a
+                      href={currentTrick.video_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold px-6 py-3 rounded-full transition-colors text-sm border border-white/20"
+                    >
+                      <Play className="w-4 h-4" />
+                      Bekijk video
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           </div>

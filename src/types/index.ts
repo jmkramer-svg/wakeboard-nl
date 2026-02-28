@@ -76,6 +76,69 @@ export interface Article {
   updated_at: string
 }
 
+export type TrickCategory = 'surface' | 'ollie' | 'invert' | 'grab' | 'rail' | 'switch'
+export type TrickDirection = 'regular' | 'switch' | 'both'
+export type TrickTypeOption = 'boot' | 'cable' | 'both'
+
+export interface TrickPrerequisites {
+  tricks: string[]
+  physical: string[]
+  mental: string[]
+}
+
+export interface TrickEquipment {
+  board_type?: string
+  fins?: string
+  protection?: string
+  speed?: string
+  line_length?: string
+  obstacle_type?: string
+}
+
+export interface TrickStepPhase {
+  edge_type?: string
+  speed_buildup?: string
+  body_position?: string
+  timing?: string
+  weight_distribution?: string
+  rotation?: string
+  focus_point?: string
+  grab_timing?: string
+  knee_position?: string
+  board_position?: string
+  edge_choice?: string
+  knee_absorption?: string
+  ride_out?: string
+}
+
+export interface TrickSteps {
+  approach: TrickStepPhase
+  takeoff: TrickStepPhase
+  air: TrickStepPhase
+  landing: TrickStepPhase
+}
+
+export interface TrickMistake {
+  mistake: string
+  explanation: string
+}
+
+export interface TrickExercise {
+  title: string
+  description: string
+}
+
+export interface TrickSafety {
+  injury_risks: string[]
+  safe_falling: string
+  when_to_stop: string
+}
+
+export interface TrickVariation {
+  name: string
+  description: string
+}
+
 export interface Trick {
   id: string
   title: string
@@ -89,6 +152,17 @@ export interface Trick {
   published_at: string | null
   created_at: string
   updated_at: string
+  category: TrickCategory | null
+  difficulty_level: number
+  direction: TrickDirection
+  trick_type: TrickTypeOption
+  prerequisites: TrickPrerequisites
+  equipment: TrickEquipment
+  steps: TrickSteps
+  common_mistakes: TrickMistake[]
+  exercise_progression: TrickExercise[]
+  safety: TrickSafety
+  variations: TrickVariation[]
 }
 
 export interface Review {
