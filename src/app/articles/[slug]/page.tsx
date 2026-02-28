@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Article, FaqItem } from '@/types'
 import { extractToc, addHeadingIds } from '@/lib/toc'
@@ -52,8 +52,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
+const TRICKGIDS_SLUG = 'de-meest-populaire-wakeboard-tricks-een-complete-gids-voor-beginners-en-gevorderden'
+
 export default async function ArticleDetailPage({ params }: Props) {
   const { slug } = await params
+
+  if (slug === TRICKGIDS_SLUG) redirect('/trickgids')
+
   const supabase = await createClient()
   const { data } = await supabase
     .from('articles')

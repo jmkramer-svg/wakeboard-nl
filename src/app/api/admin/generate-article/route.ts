@@ -62,18 +62,8 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Extract focus_keyword from JSON block for Pexels search
-      const jsonMatch = fullText.match(/```json\s*([\s\S]*?)```/)
-      let searchQuery = topic
-      if (jsonMatch) {
-        try {
-          const seo = JSON.parse(jsonMatch[1])
-          if (seo.focus_keyword) searchQuery = seo.focus_keyword
-        } catch {}
-      }
-
-      // Search Pexels for relevant photos
-      const photos = await searchPexelsPhotos(`${searchQuery} wakeboard`, 2)
+      // Search Pexels for wakeboarding photos (fixed query to avoid mixed water sport results)
+      const photos = await searchPexelsPhotos('wakeboarding', 3)
 
       // Send marker + image data
       controller.enqueue(

@@ -73,7 +73,7 @@ export default async function HomePage() {
     <div className="bg-white">
 
       {/* ── HERO ── */}
-      <section className="relative h-[88vh] min-h-[540px] flex items-center overflow-hidden">
+      <section className="relative min-h-[540px] h-auto py-24 sm:py-32 flex items-center overflow-hidden">
         <img
           src="https://images.unsplash.com/photo-1610665893833-3692e97e1ee8?auto=format&fit=crop&w=1920&q=80"
           alt=""
@@ -93,22 +93,22 @@ export default async function HomePage() {
               <span className="text-cyan-400">wakeboard</span><br />
               platform van Nederland!
             </h1>
-            <p className="text-white/65 text-base sm:text-lg leading-relaxed mb-10 max-w-md">
+            <p className="text-white/65 text-base sm:text-lg leading-relaxed mb-6 max-w-md">
               Ontdek kabelbanen, waterski en bootrijden bij jou in de buurt — overal in Nederland.
             </p>
-            <div className="flex flex-wrap sm:flex-nowrap gap-3">
-              <Link href="/articles" className="inline-flex items-center gap-1.5 bg-white/15 border border-white/40 text-white font-semibold px-5 py-2.5 rounded-full hover:bg-white/25 transition-colors text-sm backdrop-blur-sm whitespace-nowrap">
+            <div className="flex flex-wrap gap-3">
+              <Link href="/articles" className="inline-flex items-center gap-1.5 bg-white/20 border border-white/40 text-white font-semibold px-6 py-3 rounded-full hover:bg-white/30 transition-colors text-base backdrop-blur-sm">
                 Artikelen
               </Link>
-              <Link href="/trickgids" className="inline-flex items-center gap-1.5 bg-white/15 border border-white/40 text-white font-semibold px-5 py-2.5 rounded-full hover:bg-white/25 transition-colors text-sm backdrop-blur-sm whitespace-nowrap">
-                Dé WakeboardNL Trickgids
+              <Link href="/trickgids" className="inline-flex items-center gap-1.5 bg-white/20 border border-white/40 text-white font-semibold px-6 py-3 rounded-full hover:bg-white/30 transition-colors text-base backdrop-blur-sm">
+                Trickgids
               </Link>
-              <Link href="/wedstrijden" className="inline-flex items-center gap-1.5 bg-white/15 border border-white/40 text-white font-semibold px-5 py-2.5 rounded-full hover:bg-white/25 transition-colors text-sm backdrop-blur-sm whitespace-nowrap">
+              <Link href="/wedstrijden" className="inline-flex items-center gap-1.5 bg-white/20 border border-white/40 text-white font-semibold px-6 py-3 rounded-full hover:bg-white/30 transition-colors text-base backdrop-blur-sm">
                 Wedstrijden
               </Link>
-              <Link href="/spots" className="inline-flex items-center gap-1.5 bg-white text-slate-900 font-bold px-5 py-2.5 rounded-full hover:bg-cyan-50 transition-colors text-sm shadow-xl whitespace-nowrap">
+              <Link href="/spots" className="inline-flex items-center gap-1.5 bg-white text-slate-900 font-bold px-6 py-3 rounded-full hover:bg-cyan-50 transition-colors text-base shadow-xl">
                 Locaties
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

@@ -277,6 +277,11 @@ export default function ArticleForm({ article }: ArticleFormProps) {
 
       editorRef.current?.setContent(articleHtml)
 
+      // Use 3rd photo as cover image if available and no cover is set yet
+      if (photos.length >= 3 && !form.cover_image_url) {
+        set('cover_image_url', photos[2].url)
+      }
+
       // Extract title from H1
       const h1Match = fullText.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)
       const extractedTitle = h1Match
