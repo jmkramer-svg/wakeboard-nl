@@ -34,11 +34,16 @@ Het artikel is voor wakeboard-nl.nl, de complete Nederlandse gids voor wakeboard
 ## Structuurregels
 - Gebruik HTML-formaat: <h1> voor de hoofdtitel, <h2> voor secties, <h3> voor subsecties, <p> voor tekst.
 - Begin met EXACT ÉÉN <h1> als hoofdtitel.
-- Gebruik minimaal 4 <h2> kopjes voor duidelijke secties.
-- Houd alinea's kort: max 3-4 zinnen per <p>.
-- Maak het artikel minimaal 1000 woorden lang.
-- Gebruik <ul>/<ol> lijsten waar gepast.
+- Gebruik VEEL tussenkopjes: minimaal 8-12 <h2> kopjes. Elk deelonderwerp krijgt een eigen <h2>.
+- Splits het artikel op in korte, scanbare secties.
+- Elke <h2>-sectie bevat 3-5 korte alinea's. NOOIT slechts 1 alinea onder een kopje.
+- Houd alinea's KORT: max 1-2 zinnen per <p>. Begin na elke gedachte of elk punt een NIEUWE <p>-tag.
+- Gebruik <h3> binnen secties als er meerdere deelaspecten zijn.
+- Maak het artikel minimaal 1200 woorden lang.
+- Gebruik <ul>/<ol> lijsten waar gepast (tips, opsommingen, voor-/nadelen).
 - Gebruik <strong> voor belangrijke termen.
+- Voeg waar relevant een pluspunten/minpunten-lijst toe met <ul>.
+- Maak kopjes concreet en beschrijvend, niet vaag. Bijvoorbeeld: "Welk board past bij beginners?" in plaats van "Boards".
 
 ## SEO-regels
 - Verwerk het focus-keyword natuurlijk in: de H1, de eerste alinea, minimaal 2 H2-kopjes, en door het hele artikel.

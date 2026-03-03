@@ -28,7 +28,7 @@ export default async function ArticlesPage() {
     .from('articles')
     .select('*')
     .eq('is_published', true)
-    .neq('slug', TRICKGIDS_SLUG)
+
     .order('published_at', { ascending: false })
 
   const articles = (data ?? []) as Article[]

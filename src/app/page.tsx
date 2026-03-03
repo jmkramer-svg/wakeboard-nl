@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import SpotCard from '@/components/SpotCard'
+import SpotMapWrapper from '@/components/SpotMapWrapper'
 import { Spot, Article, Trick } from '@/types'
-import { ArrowRight, ChevronRight, Calendar, Play } from 'lucide-react'
+import { ArrowRight, ChevronRight, Calendar, Play, MapPin } from 'lucide-react'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -10,21 +10,6 @@ export const metadata: Metadata = {
   description: 'Vind kabelbanen, bootrijden en waterski locaties in Nederland. De complete gids voor alle wakeboardspots per provincie.',
   openGraph: { title: 'Wakeboard NL — Vind jouw wakeboardspot in Nederland', description: 'De complete gids voor alle wakeboardspots in Nederland.', type: 'website' },
   alternates: { canonical: '/' },
-}
-
-const PROVINCE_PHOTOS: Record<string, string> = {
-  'Noord-Holland':  'https://images.unsplash.com/photo-1584001645107-9e10dee34873?w=600&auto=format&fit=crop&q=70',
-  'Zuid-Holland':   'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=600&auto=format&fit=crop&q=70',
-  'Noord-Brabant':  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=70',
-  'Gelderland':     'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=600&auto=format&fit=crop&q=70',
-  'Utrecht':        'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=600&auto=format&fit=crop&q=70',
-  'Limburg':        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&auto=format&fit=crop&q=70',
-  'Overijssel':     'https://images.unsplash.com/photo-1531722569936-825d4eea6ae3?w=600&auto=format&fit=crop&q=70',
-  'Flevoland':      'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&auto=format&fit=crop&q=70',
-  'Friesland':      'https://images.unsplash.com/photo-1530053969600-caed2596d242?w=600&auto=format&fit=crop&q=70',
-  'Groningen':      'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=600&auto=format&fit=crop&q=70',
-  'Drenthe':        'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&auto=format&fit=crop&q=70',
-  'Zeeland':        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=70',
 }
 
 const DIFFICULTY_COLORS: Record<string, string> = {
@@ -47,27 +32,18 @@ function getYouTubeEmbedUrl(url: string): string | null {
 export default async function HomePage() {
   const supabase = await createClient()
 
-  const [{ data: spots }, { data: provinceCounts }, { data: articles }, { data: tricks }] = await Promise.all([
-    supabase.from('spots').select('*').eq('is_published', true).order('created_at', { ascending: false }).limit(3),
-    supabase.from('spots').select('province').eq('is_published', true),
+  const [{ data: spots }, { data: articles }, { data: tricks }] = await Promise.all([
+    supabase.from('spots').select('*').eq('is_published', true).order('created_at', { ascending: false }),
     supabase.from('articles').select('*').eq('is_published', true).order('published_at', { ascending: false }).limit(3),
     supabase.from('tricks').select('*').eq('is_current', true).eq('is_published', true).limit(1),
   ])
 
-  const featuredSpots: Spot[] = spots ?? []
+  const allSpots: Spot[] = spots ?? []
   const latestArticles: Article[] = articles ?? []
   const currentTrick: Trick | null = (tricks ?? [])[0] ?? null
 
-  // Tel spots per provincie
-  const counts: Record<string, number> = {}
-  for (const s of (provinceCounts ?? [])) {
-    counts[s.province] = (counts[s.province] ?? 0) + 1
-  }
-  const totalSpots = provinceCounts?.length ?? 0
-
-  const provinces = Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
+  const totalSpots = allSpots.length
+  const uniqueProvinces = new Set(allSpots.map((s) => s.province)).size
 
   return (
     <div className="bg-white">
@@ -236,59 +212,34 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── BROWSE PER PROVINCIE ── */}
+      {/* ── ALLE SPOTS KAART ── */}
       <section className="py-20 sm:py-24 bg-slate-50">
         <div className="max-w-6xl mx-auto px-5">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
             <div>
-              <p className="text-cyan-600 text-xs font-semibold uppercase tracking-widest mb-2">Ontdekken per regio</p>
-              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">Waar wil jij rijden?</h2>
+              <p className="text-cyan-600 text-xs font-semibold uppercase tracking-widest mb-2">Alle locaties op de kaart</p>
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">Vind jouw spot</h2>
             </div>
             <Link href="/spots" className="text-sm font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 transition-colors">
-              Alle provincies <ChevronRight className="w-4 h-4" />
+              Bekijk alle spots <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {provinces.map(([province, count]) => (
-              <Link
-                key={province}
-                href={`/spots?province=${province}`}
-                className="group relative rounded-2xl overflow-hidden aspect-[4/3] shadow-sm hover:shadow-lg transition-all duration-300"
-              >
-                <img
-                  src={PROVINCE_PHOTOS[province] ?? 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&auto=format&fit=crop&q=70'}
-                  alt={province}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <h3 className="text-white font-bold text-sm leading-tight">{province}</h3>
-                  <p className="text-white/60 text-xs mt-0.5">{count} {count === 1 ? 'spot' : 'spots'}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── UITGELICHTE SPOTS ── */}
-      <section className="py-20 sm:py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-5">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
-            <div>
-              <p className="text-cyan-600 text-xs font-semibold uppercase tracking-widest mb-2">Vers toegevoegd</p>
-              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">Nieuwste spots</h2>
-            </div>
-            <Link href="/spots" className="text-sm font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 transition-colors">
-              Alle {totalSpots} spots <ChevronRight className="w-4 h-4" />
-            </Link>
+          <div className="flex flex-wrap gap-3 mb-8">
+            <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 text-sm font-medium px-4 py-2 rounded-full shadow-sm">
+              <MapPin className="w-3.5 h-3.5 text-cyan-500" />
+              {totalSpots} spots
+            </span>
+            <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 text-sm font-medium px-4 py-2 rounded-full shadow-sm">
+              {uniqueProvinces} provincies
+            </span>
+            <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 text-sm font-medium px-4 py-2 rounded-full shadow-sm">
+              Kabel &amp; Boot
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {featuredSpots.map((spot) => (
-              <SpotCard key={spot.id} spot={spot} />
-            ))}
+          <div className="rounded-2xl overflow-hidden shadow-lg">
+            <SpotMapWrapper spots={allSpots} height="500px" />
           </div>
         </div>
       </section>

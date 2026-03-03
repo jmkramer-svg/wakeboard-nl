@@ -57,7 +57,6 @@ const TRICKGIDS_SLUG = 'de-meest-populaire-wakeboard-tricks-een-complete-gids-vo
 export default async function ArticleDetailPage({ params }: Props) {
   const { slug } = await params
 
-  if (slug === TRICKGIDS_SLUG) redirect('/trickgids')
 
   const supabase = await createClient()
   const { data } = await supabase
@@ -218,7 +217,7 @@ export default async function ArticleDetailPage({ params }: Props) {
         <div className="max-w-3xl mx-auto px-5 py-12 sm:py-16">
           {toc.length > 0 && <TableOfContents items={toc} />}
           <div
-            className="prose prose-slate max-w-none prose-headings:font-black prose-headings:text-slate-900 prose-headings:tracking-tight prose-a:text-cyan-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-2xl prose-img:shadow-md prose-strong:text-slate-900"
+            className="article-content"
             dangerouslySetInnerHTML={{ __html: contentWithIds }}
           />
         </div>
